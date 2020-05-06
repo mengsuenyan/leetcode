@@ -165,6 +165,29 @@ pub fn search_insert(nums: Vec<i32>, target: i32) -> i32 {
     }
 }
 
+/// Given an array nums and a value val, remove all instances of that value in-place and return the new length.  
+///   
+/// Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.  
+///   
+/// The order of elements can be changed. It doesn't matter what you leave beyond the new length.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/remove-element  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// T-O(n), M-O(1)
+pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
+    
+    let mut cnt = 0;
+    for i in 0..nums.len() {
+        let ele = nums[i];
+        if ele != val {
+            nums[cnt] = ele;
+            cnt += 1;
+        }
+    }
+    
+    cnt as i32
+}
 
 #[cfg(test)]
 mod tests {
@@ -173,7 +196,7 @@ mod tests {
         let cases = [
             (vec![-1,0,1,2,-1,-4], vec![vec![-1,-1,2], vec![-1,0,1]]),
             (vec![], vec![]),
-            (vec![0,0,0], vec![vec![0,0,0]]),
+            (vec!["0",0,0], vec![vec![0,0,0]]),
             (vec![1,1,-2], vec![vec![-2,1,1]]),
         ];
         
