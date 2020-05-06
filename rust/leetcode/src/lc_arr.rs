@@ -189,6 +189,32 @@ pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
     cnt as i32
 }
 
+/// Given a set of distinct integers, nums, return all possible subsets (the power set).  
+///   
+/// Note: The solution set must not contain duplicate subsets.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/subsets  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+///  O(2^n)
+pub fn subsets(nums: Vec<i32>) -> Vec<Vec<i32>> {
+    let len = 2 << nums.len();
+    let mut v = Vec::with_capacity(len);
+    
+    let mut sub = Vec::with_capacity(nums.len());
+    for i in 0..(1i32 << (nums.len() as i32)) {
+        for j in 0..(nums.len() as i32) {
+            if (i & (1 << j)) != 0 {
+                sub.push(nums[j as usize]);
+            }
+        }
+        v.push(sub.clone());
+        sub.clear();
+    }
+    
+    v
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -236,6 +262,29 @@ mod tests {
 
         for c in cases.iter() {
             assert_eq!(super::climb_stairs(c.0), c.1);
+        }
+    }
+    
+    #[test]
+    fn subsets() {
+        let cases = [
+            ([1,2,3], [
+                vec![3],
+                vec![1],
+                vec![2],
+                vec![1,2,3],
+                vec![1,3],
+                vec![2,3],
+                vec![1,2],
+                vec![]
+            ]),
+        ];
+        for c in cases.iter() {
+            let mut s = super::subsets(c.0.to_vec());
+            s.sort();
+            let mut c1 = c.1.to_vec();
+            c1.sort();
+            assert_eq!(s, c1);
         }
     }
 }
