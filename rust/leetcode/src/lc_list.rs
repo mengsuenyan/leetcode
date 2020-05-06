@@ -59,6 +59,60 @@ pub fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
     head
 }
 
+/// Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/merge-two-sorted-lists  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(n)
+pub fn merge_two_lists(l1: Option<Box<ListNode>>, l2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+    if l1.is_none() {
+        return l2;
+    } else if l2.is_none() {
+        return l1;
+    }
+    
+    let (mut l1, mut l2) = (l1, l2);
+    let (mut ml1, mut ml2) = (&mut l1, &mut l2);
+    let mut head: Option<Box<ListNode>> = None;
+    let mut h= &mut head;
+    
+    loop {
+        let val = if ml1.is_some() && ml2.is_some() {
+            if ml1.as_ref().unwrap().val < ml2.as_ref().unwrap().val {
+                let tmp = ml1.as_ref().unwrap().val;
+                ml1 = &mut ml1.as_mut().unwrap().next;
+                tmp
+            } else {
+                let tmp = ml2.as_ref().unwrap().val;
+                ml2 = &mut ml2.as_mut().unwrap().next;
+                tmp
+            }
+            
+        } else if ml1.is_some() {
+            let tmp = ml1.as_ref().unwrap().val;
+            ml1 = &mut ml1.as_mut().unwrap().next;
+            tmp
+        } else if ml2.is_some() {
+            let tmp = ml2.as_ref().unwrap().val;
+            ml2 = &mut ml2.as_mut().unwrap().next;
+            tmp
+        } else {
+            break;
+        };
+        
+        if h.is_some() {
+            h.as_mut().unwrap().next = Some(Box::new(ListNode::new(val)));
+            h = &mut h.as_mut().unwrap().next;
+        } else {
+            head = Some(Box::new(ListNode::new(val)));
+            h = &mut head;
+        }
+    }
+    
+    head
+}
+
 #[cfg(test)]
 mod tests {
     use crate::lc_list::ListNode;
@@ -66,14 +120,30 @@ mod tests {
     #[test]
     fn delete_duplicates() {
         let cases = [
-            // (vec![1,1,2], vec![1,2]),
+            (vec![1,1,2], vec![1,2]),
             (vec![1,1,2,3,3], vec![1,2,3]),
-            // (vec![], vec![]),
+            (vec![], vec![]),
         ];
         
         for c in cases.iter() {
             let l = ListNode::from_vec(&c.0);
             assert_eq!(super::delete_duplicates(l), ListNode::from_vec(&c.1));
+        }
+    }
+    
+    #[test]
+    fn merge_two_lists() {
+        let cases = [
+            (vec![1,2,4], vec![1,3,4], vec![1,1,2,3,4,4]),
+            (vec![1,2,4], vec![], vec![1,2,4]),
+            (vec![], vec![1,3,4], vec![1,3,4]),
+            (vec![], vec![], vec![]),
+        ];
+
+        for c in cases.iter() {
+            let l1 = ListNode::from_vec(&c.0);
+            let l2 = ListNode::from_vec(&c.1);
+            assert_eq!(super::merge_two_lists(l1, l2), ListNode::from_vec(&c.2));
         }
     }
 }
