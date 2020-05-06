@@ -107,6 +107,31 @@ pub fn count_and_say(n: i32) -> String {
     String::from_utf8(v).unwrap()
 }
 
+/// Implement strStr().  
+///   
+/// Return the index of the first occurrence of needle in haystack, or -1 if needle is not part of haystack.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/implement-strstr  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(n)  
+pub fn str_str(haystack: String, needle: String) -> i32 {
+    if haystack.is_empty() && needle.is_empty() {
+        return 0;
+    }
+    
+    let hs = haystack.as_str();
+    let nd = needle.as_str();
+    for i in 0..hs.len() {
+        let sub = &hs[i..];
+        if sub.starts_with(nd) {
+            return i as i32;
+        }
+    }
+    
+    -1
+}
+
 #[cfg(test)]
 mod tests {
     
