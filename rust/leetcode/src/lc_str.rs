@@ -66,6 +66,47 @@ pub fn add_binary(a: String, b: String) -> String {
     String::from_utf8(re).unwrap()
 }
 
+/// The count-and-say sequence is the sequence of integers with the first five terms as following:  
+///   
+/// 1 is read off as "one 1" or 11.  
+/// 11 is read off as "two 1s" or 21.  
+/// 21 is read off as "one 2, then one 1" or 1211.  
+///   
+/// Given an integer n where 1 ≤ n ≤ 30, generate the nth term of the count-and-say sequence. You can do so recursively, in other words from the previous member read off the digits, counting the number of digits in groups of the same digit.  
+///   
+/// Note: Each term of the sequence of integers will be represented as a string.  
+/// O(n!)
+pub fn count_and_say(n: i32) -> String {
+    let mut v = vec![b'1'];
+
+    for _ in 1..n {
+        let mut subv = Vec::new();
+
+        let mut tgt = v.first().unwrap().clone();
+        let mut cnt = 0;
+        for &ele in v.iter() {
+            if ele == tgt {
+                cnt += 1;
+            } else {
+                subv.push(b'0' + cnt);
+                subv.push(tgt);
+                tgt = ele;
+                cnt = 1;
+            }
+        }
+
+        if cnt > 0 {
+            subv.push(b'0' + cnt);
+            subv.push(tgt);
+        }
+        
+        v.clear();
+        v.append(&mut subv);
+    }
+
+    String::from_utf8(v).unwrap()
+}
+
 #[cfg(test)]
 mod tests {
     
@@ -90,6 +131,21 @@ mod tests {
         ];
         for c in cases.iter() {
             assert_eq!(super::add_binary(String::from(c.0), String::from(c.1)), String::from(c.2));
+        }
+    }
+    
+    #[test]
+    fn count_and_say() {
+        let cases = [
+            (1, "1"),
+            (2, "11"),
+            (3, "21"),
+            (4, "1211"),
+            (5, "111221"),
+        ];
+        
+        for c in cases.iter() {
+            assert_eq!(super::count_and_say(c.0).as_str(), c.1);
         }
     }
 }
