@@ -94,6 +94,39 @@ pub fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
     v
 }
 
+/// Given a non-empty array of digits representing a non-negative integer, plus one to the integer.  
+///   
+/// The digits are stored such that the most significant digit is at the head of the list, and each element in the array contain a single digit.  
+///   
+/// You may assume the integer does not contain any leading zero, except the number 0 itself.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/plus-one  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(n)
+pub fn plus_one(digits: Vec<i32>) -> Vec<i32> {
+    let mut v = Vec::with_capacity(digits.len() + 1);
+    
+    let mut carry = 1;
+    for &e in digits.iter().rev() {
+        let ele = e + carry;
+        carry = if ele > 9 {
+            v.push(0);
+            ele - 9
+        } else {
+            v.push(ele);
+            0
+        };
+    }
+    
+    if carry > 0 {
+        v.push(carry);
+    }
+    
+    v.reverse();
+    v
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -118,6 +151,18 @@ mod tests {
         
         for ele in cases.iter() {
             assert_eq!(super::four_sum(ele.1.clone(), ele.0), ele.2.clone());
+        }
+    }
+    
+    #[test]
+    fn plus_one() {
+        let cases = [
+            (vec![1,2,3], vec![1,2,4]),
+            (vec![9,9,9], vec![1,0,0,0]),
+        ];
+        
+        for c in cases.iter() {
+            assert_eq!(super::plus_one(c.0.clone()), c.1);
         }
     }
 }
