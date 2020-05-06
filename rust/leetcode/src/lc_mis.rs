@@ -52,6 +52,77 @@ pub fn spiral_order(matrix: Vec<Vec<i32>>) -> Vec<i32> {
     v
 }
 
+/// O(n)
+/// ---上---
+/// |  ... |
+/// 左  ... 右
+/// |---下---|
+pub fn generate_matrix(n: i32) -> Vec<Vec<i32>> {
+    if n < 1 {
+        return vec![];
+    }
+    
+    let mut v = vec![vec![0i32; n as usize]; n as usize];
+    let mut lidx = 0;
+    let mut ridx = (n as usize) - 1;
+    let mut uidx = 0;
+    let mut didx = (n as usize) - 1; 
+    
+    let n = n * n;
+    let mut num = 0;
+    loop {
+        // 上
+        let mut col = lidx;
+        while col <= ridx {
+            num += 1;
+            v[uidx][col] = num;
+            col += 1;
+        }
+        uidx += 1;
+        if num >= n {break;}
+        
+        // 右
+        let mut row = uidx;
+        while row <= didx {
+            num += 1;
+            v[row][ridx] = num;
+            row += 1;
+        }
+        ridx -= 1;
+        if num >= n {break;}
+        
+        // 下
+        let mut col = ridx;
+        while col >= lidx {
+            num += 1;
+            v[didx][col] = num;
+            if col == lidx {
+                break;
+            } else {
+                col -= 1;
+            }
+        }
+        didx -= 1;
+        if num >= n {break;}
+        
+        // 左
+        let mut row = didx;
+        while row >= uidx {
+            num += 1;
+            v[row][lidx] = num;
+            if row == uidx {
+                break;
+            } else {
+                row -= 1;
+            }
+        }
+        lidx += 1;
+        if num >= n {break;}
+    }
+    
+    v
+}
+
 #[cfg(test)]
 mod tests {
     use std::cmp::Ordering;
@@ -107,6 +178,30 @@ mod tests {
         
         for c in cases.iter() {
             assert_eq!(super::spiral_order(c.0.clone()), c.1);
+        }
+    }
+    
+    #[test]
+    fn generate_matrix() {
+        let cases = [
+            (vec![
+                vec![1,2,3],
+                vec![8,9,4],
+                vec![7,6,5]
+            ], 3),
+            (vec![
+                vec![1]
+            ], 1),
+            (vec![
+                vec![1,2,3,4],
+                vec![12,13,14,5],
+                vec![11,16,15,6],
+                vec![10,9,8,7]
+            ], 4),
+        ];
+        
+        for c in cases.iter() {
+            assert_eq!(super::generate_matrix(c.1), c.0);
         }
     }
 }
