@@ -132,6 +132,43 @@ pub fn str_str(haystack: String, needle: String) -> i32 {
     -1
 }
 
+/// Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.  
+///   
+/// An input string is valid if:  
+///   
+/// Open brackets must be closed by the same type of brackets.  
+/// Open brackets must be closed in the correct order.  
+///   
+/// Note that an empty string is also considered valid.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/valid-parentheses  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(n)
+pub fn is_valid(s: String) -> bool {
+    if s.is_empty() {
+        return true;
+    }
+    
+    let mut want = Vec::with_capacity(s.len()/2);
+    for &ele in s.as_bytes().iter() {
+        if ele == b'(' {
+            want.push(b')');
+        } else if ele == b'{' {
+            want.push(b'}');
+        } else if ele == b'[' {
+            want.push(b']');
+        } else {
+            match want.pop() {
+                Some(w) => if w != ele { return false; },
+                None => { return false; },
+            }
+        }
+    }
+
+    want.is_empty()
+}
+
 #[cfg(test)]
 mod tests {
     
