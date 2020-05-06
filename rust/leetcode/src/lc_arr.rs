@@ -1,3 +1,5 @@
+use std::collections::{HashMap, HashSet}; 
+
 macro_rules! impl_three_sum {
     ($Neg:ident, $Pos:ident, $V:ident, $Tgt: ident) => {
         for (i, &n1) in $Neg.iter().enumerate() {
@@ -42,6 +44,56 @@ pub fn three_sum(nums: Vec<i32>) -> Vec<Vec<i32>> {
     v
 }
 
+pub fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+    let mut v: Vec<Vec<i32>> = Vec::new();
+    if nums.len() < 4 {
+        return v;
+    }
+    
+    v.sort_unstable();
+    let numc = nums.as_slice();
+    let mut cache : HashMap<i32, HashSet<(usize, usize, i32, i32)>> = HashMap::new();
+    for (i, &e1) in numc.iter().enumerate() {
+        let rem_numc = &numc[(i+1)..];
+        for (j, &e2) in rem_numc.iter().enumerate() {
+            let r = e1 + e2;
+            match cache.get_mut(&r) { 
+                Some(s) => {
+                    s.insert((i, j+1+i, e1, e2));
+                },
+                None => {
+                    let mut s = HashSet::new();
+                    s.insert((i, j+1+i, e1, e2));
+                    cache.insert(r, s);
+                },
+            };
+        }
+    }
+    
+    for (i, &e1) in numc.iter().enumerate() {
+        let rem_numc = &numc[(i+1)..];
+        for (j, &e2) in rem_numc.iter().enumerate() {
+            let r = target - e1 - e2;
+            match cache.get_mut(&r) {
+                Some(s) => {
+                    for ele in s.iter() {
+                        if ele.0 != i && ele.1 != (j+i+1) && ele.0 != (j+i+1) && ele.1 != i {
+                            let mut t = vec![e1, e2, ele.2, ele.3];
+                            t.sort();
+                            v.push(t);
+                        }
+                    }
+                },
+                None => {},
+            }
+        }
+    }
+    
+    v.sort();
+    v.dedup();
+    v
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -55,6 +107,17 @@ mod tests {
         
         for ele in cases.iter() {
             assert_eq!(super::three_sum(ele.0.clone()), ele.1.clone());
+        }
+    }
+    
+    #[test]
+    fn four_sum() {
+        let cases = [
+            (0, vec![1,0,-1,0,-2,2], vec![vec![-2,-1,1,2], vec![-2,0,0,2], vec![-1,0,0,1]])
+        ];
+        
+        for ele in cases.iter() {
+            assert_eq!(super::four_sum(ele.1.clone(), ele.0), ele.2.clone());
         }
     }
 }
