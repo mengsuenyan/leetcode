@@ -127,6 +127,29 @@ pub fn plus_one(digits: Vec<i32>) -> Vec<i32> {
     v
 }
 
+/// You are climbing a stair case. It takes n steps to reach to the top.  
+///   
+/// Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?  
+///   
+/// Note: Given n will be a positive integer.  
+///   
+/// Example 1:  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/climbing-stairs  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(n)
+pub fn climb_stairs(n: i32) -> i32 {
+    let mut prev = 0;
+    let mut cur = 1;
+    for _ in 1..=n {
+        let tmp = cur;
+        cur = prev + cur;
+        prev = tmp;
+    }
+    cur
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -163,6 +186,17 @@ mod tests {
         
         for c in cases.iter() {
             assert_eq!(super::plus_one(c.0.clone()), c.1);
+        }
+    }
+    
+    #[test]
+    fn climb_stairs() {
+        let cases = [
+            (3,3),
+        ];
+
+        for c in cases.iter() {
+            assert_eq!(super::climb_stairs(c.0), c.1);
         }
     }
 }
