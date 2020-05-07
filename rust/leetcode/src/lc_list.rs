@@ -198,6 +198,36 @@ pub fn reverse_between(head: Option<Box<ListNode>>, m: i32, n: i32) -> Option<Bo
     ListNode::from_vec(&re)
 }
 
+/// Given a linked list, reverse the nodes of a linked list k at a time and return its modified list.  
+///   
+/// k is a positive integer and is less than or equal to the length of the linked list. If the number of nodes is not a multiple of k then left-out nodes in the end should remain as it is.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/reverse-nodes-in-k-group  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(n)
+pub fn reverse_k_group(head: Option<Box<ListNode>>, k: i32) -> Option<Box<ListNode>> {
+    let mut h = &head;
+    let mut re = Vec::new();
+    
+    while h.is_some() {
+        re.push(h.as_ref().unwrap().val);
+        h = &h.as_ref().unwrap().next;
+    }
+    
+    let k = k as usize;
+    let num = re.len() / k;
+    let res = re.as_mut_slice();
+    for i in 0..num
+    {
+        let (start, end) = (i * k, i * k + k);
+        let sub = &mut res[start..end];
+        sub.reverse();
+    }
+    
+    ListNode::from_vec(&re)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::lc_list::ListNode;
