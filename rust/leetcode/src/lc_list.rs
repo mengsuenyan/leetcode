@@ -170,6 +170,34 @@ pub fn partition(head: Option<Box<ListNode>>, x: i32) -> Option<Box<ListNode>> {
     
 }
 
+/// Reverse a linked list from position m to n. Do it in one-pass.  
+///   
+/// Note: 1 ≤ m ≤ n ≤ length of list.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/reverse-linked-list-ii  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(n) 
+pub fn reverse_between(head: Option<Box<ListNode>>, m: i32, n: i32) -> Option<Box<ListNode>> {
+    if head.is_none() || m == n {
+        return head;
+    }
+    
+    let mut h = &head;
+    let mut re = Vec::new();
+    
+    while h.is_some() {
+        re.push(h.as_ref().unwrap().val);
+        h = &h.as_ref().unwrap().next;
+    }
+
+    let (m, n) = ((m-1) as usize, (n-1) as usize);
+    let sub = &mut (re.as_mut_slice())[m..=n];
+    sub.reverse();
+    
+    ListNode::from_vec(&re)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::lc_list::ListNode;
