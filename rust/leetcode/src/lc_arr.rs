@@ -231,6 +231,43 @@ pub fn subsets_with_dup(nums: Vec<i32>) -> Vec<Vec<i32>> {
     nums
 }
 
+/// Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in-place.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/set-matrix-zeroes  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(n)
+pub fn set_zeroes(matrix: &mut Vec<Vec<i32>>) {
+    if matrix.is_empty() || matrix.first().unwrap().is_empty() {
+        return;
+    }
+    let rows = matrix.len();
+    let cols = matrix.first().unwrap().len();
+    let mut zero_row = Vec::with_capacity(rows);
+    let mut zero_col = Vec::with_capacity(cols);
+    
+    for (i, r) in matrix.iter().enumerate() {
+        for (j, c) in r.iter().enumerate() {
+            if *c == 0 {
+                zero_col.push(j);
+                zero_row.push(i);
+            }
+        }
+    }
+    
+    for &i in zero_row.iter() {
+        let len = matrix[i].len();
+        matrix[i].clear();
+        matrix[i].resize(len, 0);
+    }
+    
+    for &j in zero_col.iter() {
+        for r in matrix.iter_mut() {
+            r[j] = 0;
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
