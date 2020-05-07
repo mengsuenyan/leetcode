@@ -19,7 +19,6 @@ impl ListNode {
     }
 
 
-    #[allow(dead_code)]
     fn from_vec(v: &Vec<i32>) -> Option<Box<ListNode>> {
         if v.is_empty() {
             return None;
@@ -35,6 +34,19 @@ impl ListNode {
         }
         
         h
+    }
+    
+    fn to_vec(head: &Option<Box<ListNode>>) -> Vec<i32>
+    {
+        let mut v = Vec::new();
+        let mut head = head;
+        
+        while head.is_some() {
+            v.push(head.as_ref().unwrap().val);
+            head = &head.as_ref().unwrap().next;
+        }
+        
+        v
     }
 }
 
@@ -226,6 +238,20 @@ pub fn reverse_k_group(head: Option<Box<ListNode>>, k: i32) -> Option<Box<ListNo
     }
     
     ListNode::from_vec(&re)
+}
+
+/// Given a linked list, remove the n-th node from the end of list and return its head.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(n)
+pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {  
+    let mut v = ListNode::to_vec(&head);
+    
+    v.remove(v.len() - (n as usize));
+    
+    ListNode::from_vec(&v)
 }
 
 #[cfg(test)]

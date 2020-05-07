@@ -123,6 +123,11 @@ pub fn generate_matrix(n: i32) -> Vec<Vec<i32>> {
     v
 }
 
+pub fn my_sqrt(x: i32) -> i32 {
+    let x = x as f64;
+    x.sqrt().floor() as i32
+}
+
 #[cfg(test)]
 mod tests {
     use std::cmp::Ordering;
@@ -203,5 +208,10 @@ mod tests {
         for c in cases.iter() {
             assert_eq!(super::generate_matrix(c.1), c.0);
         }
+    }
+    
+    #[test]
+    fn my_sqrt() {
+        assert_eq!(super::my_sqrt(2147395599), 46339);
     }
 }
