@@ -208,11 +208,27 @@ pub fn subsets(nums: Vec<i32>) -> Vec<Vec<i32>> {
                 sub.push(nums[j as usize]);
             }
         }
+        sub.sort();
         v.push(sub.clone());
         sub.clear();
     }
     
     v
+}
+
+/// Given a collection of integers that might contain duplicates, nums, return all possible subsets (the power set).  
+/// Note: The solution set must not contain duplicate subsets.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/subsets-ii  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(2^n)
+pub fn subsets_with_dup(nums: Vec<i32>) -> Vec<Vec<i32>> {
+    let mut nums = subsets(nums);
+    
+    nums.sort();
+    nums.dedup();
+    nums
 }
 
 #[cfg(test)]
