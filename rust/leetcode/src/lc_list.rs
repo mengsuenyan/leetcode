@@ -113,6 +113,63 @@ pub fn merge_two_lists(l1: Option<Box<ListNode>>, l2: Option<Box<ListNode>>) -> 
     head
 }
 
+/// Given a linked list and a value x, partition it such that all nodes less than x come before nodes greater than or equal to x.  
+///   
+/// You should preserve the original relative order of the nodes in each of the two partitions.  
+///   
+/// 来源：力扣（LeetCode）  
+/// 链接：https://leetcode-cn.com/problems/partition-list  
+/// 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。  
+/// O(n)
+pub fn partition(head: Option<Box<ListNode>>, x: i32) -> Option<Box<ListNode>> {
+    if head.is_none() {
+        return head;
+    }
+    
+    let mut head = head;
+    let mut h = &mut head;
+    let mut lt = None;
+    let mut gt =None;
+    let mut ltr = &mut lt;
+    let mut gtr = &mut gt;
+    
+    loop {
+        let val = if h.is_some() {
+            let tmp = h.as_ref().unwrap().val;
+            h = &mut h.as_mut().unwrap().next;
+            tmp
+        } else {
+            break;
+        };
+        
+        if val < x {
+            if ltr.is_none() {
+                lt = Some(Box::new(ListNode::new(val)));
+                ltr = &mut lt;
+            } else {
+                ltr.as_mut().unwrap().next = Some(Box::new(ListNode::new(val)));
+                ltr = &mut ltr.as_mut().unwrap().next;
+            }
+        } else {
+            if gtr.is_none() {
+                gt = Some(Box::new(ListNode::new(val)));
+                gtr = &mut gt;
+            } else {
+                gtr.as_mut().unwrap().next = Some(Box::new(ListNode::new(val)));
+                gtr = &mut gtr.as_mut().unwrap().next;
+            }
+        }
+    }
+    
+    if ltr.is_none() {
+        gt
+    } else {
+        ltr.as_mut().unwrap().next = gt;
+        lt
+    }
+    
+}
+
 #[cfg(test)]
 mod tests {
     use crate::lc_list::ListNode;
@@ -144,6 +201,18 @@ mod tests {
             let l1 = ListNode::from_vec(&c.0);
             let l2 = ListNode::from_vec(&c.1);
             assert_eq!(super::merge_two_lists(l1, l2), ListNode::from_vec(&c.2));
+        }
+    }
+    
+    #[test]
+    fn partition() {
+        let cases = [
+            (vec![1,4,3,2,5,2], 3, vec![1,2,2,4,3,5]),
+        ];
+
+        for c in cases.iter() {
+            let l1 = ListNode::from_vec(&c.0);
+            assert_eq!(super::partition(l1, c.1), ListNode::from_vec(&c.2));
         }
     }
 }
