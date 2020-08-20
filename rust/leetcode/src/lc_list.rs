@@ -568,6 +568,23 @@ impl LRUCache {
     }
 }
 
+/// Merge k Sorted Lists
+/// 
+/// Merge k sorted linked lists and return it as one sorted list. Analyze and describe its complexity
+pub fn merge_k_lists(lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>> {
+    // ts: O(n), sc: O(n)
+    let mut bh = std::collections::BinaryHeap::with_capacity(lists.len() << 6);
+    
+    lists.iter().for_each(|mut x| {
+        while let Some(ele) = x {
+            bh.push(ele.val);
+            x = &ele.next;
+        }
+    });
+    
+    ListNode::from_vec(&bh.into_sorted_vec())
+}
+
 #[cfg(test)]
 mod tests {
     use crate::lc_list::{ListNode, LRUCache};
