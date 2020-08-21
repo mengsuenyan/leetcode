@@ -1,3 +1,5 @@
+use std::str::Chars;
+
 pub fn longest_common_prefix(strs: Vec<String>) -> String {
     if strs.is_empty() {
         return String::from("");
@@ -169,6 +171,94 @@ pub fn is_valid(s: String) -> bool {
     want.is_empty()
 }
 
+/// Valid Palindrome
+/// 
+/// Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring
+/// cases.
+/// For example,
+/// ”A man, a plan, a canal: Panama” is a palindrome.
+/// ”race a car” is not a palindrome.
+/// Note: Have you consider that the string might be empty? is is a good question to ask during an
+/// interview.
+/// For the purpose of this problem, we define empty string as valid palindrome.
+pub fn is_palindrome(s: String) -> bool {
+    let (mut itr, mut ritr) = (s.chars(), s.chars().rev());
+    let check_next = |x: &mut std::iter::Rev<Chars>| {
+        loop {
+            match x.next() {
+                Some(x) => {
+                    if x.is_ascii_digit() { return Some(x); }
+                    else if x.is_ascii_alphabetic() {return Some(x.to_ascii_lowercase());}
+                },
+                None => {return None;},
+            }
+        }
+    };
+    
+    loop {
+        match itr.next() {
+            Some(x) => {
+                if x.is_ascii_alphanumeric() {
+                    match check_next(&mut ritr) {
+                        Some(y) => {
+                            if x.to_ascii_lowercase() != y {return false;}
+                        },
+                        None => {return false;}
+                    }
+                }
+            },
+            None => {
+                return true;
+            }
+        };
+    }
+}
+
+/// Longest Palindromic Substring
+/// 
+/// Given a string S, find the longest palindromic substring in S. You may assume that the maximum
+/// length of S is 1000, and there exists one unique longest palindromic substring.
+pub fn longest_palindrome(s: String) -> String {
+    // Manacher's algorithm
+    // 插入了特殊标记#后, 回文个数必然是奇数的. 以某一位置对称的的半轴长必然是原始回文的长度;
+    let mut ps = Vec::with_capacity((s.len() << 1) + 3);
+    ps.push('^');
+    s.chars().for_each(|x| {ps.push('#'); ps.push(x);});
+    ps.push('#');
+    ps.push('$');
+    
+    // cnt记录以i位置对称的长度(不包括自身), c记录上一次最长对称的中心位置, r记录遍历过的最远位置
+    let (mut cnt, mut c, mut r) = (Vec::new(), 0usize, 0);
+    cnt.resize(ps.len(), 0);
+    for i in 1..(ps.len()-1) {
+        // 关于c与i对称的位置(c - (i-c))
+        let m = (c << 1).wrapping_sub(i);
+        // 跳过已经比较过对称的元素, 因为m关于c和i对称, 如果r大于i, 那么m实在以c为中心的对称的轴上的,
+        // 那么m对称的轴和以i为对称的轴必然有重叠, 重叠便是min(r-i,cnt[m])
+        // r'----xx-m-xx----c--xx-i-xx----r
+        cnt[i] = if r > i {std::cmp::min(r - i, cnt[m])} else {0};
+        
+        // 以T[i]为中心, 向左右两边查找对称
+        while ps[i + 1 + cnt[i]] == ps[i - 1 - cnt[i]] {
+            cnt[i] += 1;
+        }
+        
+        if i + cnt[i] > r {
+            c = i;
+            r = i + cnt[i];
+        }
+    }
+    
+    match cnt.iter().enumerate().max_by(|&x, &y| {
+        x.1.cmp(y.1)
+    }) {
+        Some((center_idx, &max_len)) => {
+            s.chars().skip((center_idx - 1 - max_len) >> 1).take(max_len).collect()
+        },
+        None => String::new(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     
@@ -209,5 +299,33 @@ mod tests {
         for c in cases.iter() {
             assert_eq!(super::count_and_say(c.0).as_str(), c.1);
         }
+    }
+    
+    #[test]
+    fn is_palindrome() {
+
+        let cases = [
+            ("0P", false),
+            ("A man, a plan, a canal: Panama", true),
+            ("race a car", false),
+        ];
+
+        cases.iter().for_each(|x| {
+            assert_eq!(x.1, super::is_palindrome(String::from(x.0)), "cases: {:?}", x.0);
+        });
+    }
+    
+    #[test]
+    fn longest_palindrome() {
+
+        let cases = [
+            // ("aacdefcaa", "aa"),
+            ("bxabad", "aba"),
+            // ("cbbd", "bb"),
+        ];
+
+        cases.iter().for_each(|&x| {
+            assert_eq!(x.1, super::longest_palindrome(String::from(x.0)), "cases: {:?}", x.0);
+        });
     }
 }
