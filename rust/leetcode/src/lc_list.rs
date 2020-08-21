@@ -37,6 +37,7 @@ impl ListNode {
         h
     }
     
+    /// TODO: 接收Option<Box<ListNode>>的函数, 再调用to_vec, 然后处理数组后, 再from_vec转为list, 会造成内存泄漏
     fn to_vec(head: &Option<Box<ListNode>>) -> Vec<i32>
     {
         let mut v = Vec::new();
@@ -585,6 +586,94 @@ pub fn merge_k_lists(lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>>
     ListNode::from_vec(&bh.into_sorted_vec())
 }
 
+/// Insertion sort list
+/// 
+/// Sort a linked list using insertion sort
+pub fn insertion_sort_list(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+    let mut anchor = ListNode::new(0);
+    let mut head = head;
+    
+    while let Some(mut node) = head {
+        head = node.next.take();
+        
+        let mut tail = &mut anchor;
+        while tail.next.is_some() && (tail.next.as_deref_mut()?.val < node.val) {
+            tail = tail.next.as_deref_mut()?;
+        }
+        
+        node.next = tail.next.take();
+        tail.next = Some(node);
+    }
+    
+    anchor.next
+}
+
+/// Sort List
+/// 
+/// Sort a linked list in O(nlogn) time using constant space complexity
+pub fn sort_list(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+    let len = |mut x: &Option<Box<ListNode>>|{
+        let mut cnt = 0;
+        while let Some(node) = x {
+            cnt += 1;
+            x = &node.next;
+        }
+        cnt
+    };
+    
+    let len = len(&head);
+    sort_list_help1_(head, len)
+}
+
+/// split list
+fn sort_list_help1_(mut list: Option<Box<ListNode>>, len: usize) -> Option<Box<ListNode>> {
+    if list.is_none() || list.as_deref()?.next.is_none() {
+        return list;
+    }
+    
+    let half_palce = (len + 1) >> 1;
+    let mut right = &mut list;
+    for _ in 0..half_palce {
+        right = &mut right.as_deref_mut()?.next;
+    }
+    
+    let right = right.take();
+    let left = sort_list_help1_(list, half_palce);
+    let right = sort_list_help1_(right, len - half_palce);
+    
+    sort_list_help2_(left, right)
+}
+
+/// merge list
+fn sort_list_help2_(mut left: Option<Box<ListNode>>, mut right: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+    let mut anchor = ListNode::new(0);
+    let mut tail = &mut anchor.next;
+    
+    'out: loop {
+        
+        let is_left = if left.is_some() && right.is_some() {
+            if left.as_deref()?.val < right.as_deref()?.val { true } else { false }
+        } else if left.is_some() { true
+        } else if right.is_some() { false
+        } else { break 'out; };
+        
+        *tail = if is_left {
+            let mut tmp= left.take();
+            left = tmp.as_deref_mut()?.next.take();
+            tmp
+        } else {
+            let mut tmp = right.take();
+            right = tmp.as_deref_mut()?.next.take();
+            tmp
+        };
+        
+        tail = &mut tail.as_deref_mut()?.next;
+    }
+    
+    anchor.next
+}
+
+
 #[cfg(test)]
 mod tests {
     use crate::lc_list::{ListNode, LRUCache};
@@ -711,5 +800,35 @@ mod tests {
         assert_eq!(-1, cache.get(1));       // 返回 -1 (未找到)
         assert_eq!(3, cache.get(3));       // 返回  3
         assert_eq!(4, cache.get(4));       // 返回  4
+    }
+    
+    #[test]
+    fn insertion_sort_list() {
+        let cases = [
+            (vec![], vec![]),
+            (vec![4,2,1,3], vec![1,2,3,4]),
+            (vec![-1,5,3,4,0], vec![-1,0,3,4,5]),
+        ];
+        
+        cases.iter().for_each(|x| {
+            let tmp = super::insertion_sort_list(ListNode::from_vec(&x.0));
+            let tmp = ListNode::to_vec(&tmp);
+            assert_eq!(x.1, tmp, "cases: {:?}", x.0);
+        });
+    }
+    
+    #[test]
+    fn sort_list() {
+        let cases = [
+            (vec![], vec![]),
+            (vec![4,2,1,3], vec![1,2,3,4]),
+            (vec![-1,5,3,4,0], vec![-1,0,3,4,5]),
+        ];
+
+        cases.iter().for_each(|x| {
+            let tmp = super::sort_list(ListNode::from_vec(&x.0));
+            let tmp = ListNode::to_vec(&tmp);
+            assert_eq!(x.1, tmp, "cases: {:?}", x.0);
+        });
     }
 }
