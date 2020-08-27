@@ -20,7 +20,7 @@ impl ListNode {
 }
 
 impl ListNode {
-    fn from_vec(v: &Vec<i32>) -> Option<Box<ListNode>> {
+    pub fn from_vec(v: &Vec<i32>) -> Option<Box<ListNode>> {
         if v.is_empty() {
             return None;
         }
@@ -38,7 +38,7 @@ impl ListNode {
     }
     
     /// TODO: 接收Option<Box<ListNode>>的函数, 再调用to_vec, 然后处理数组后, 再from_vec转为list, 会造成内存泄漏
-    fn to_vec(head: &Option<Box<ListNode>>) -> Vec<i32>
+    pub fn to_vec(head: &Option<Box<ListNode>>) -> Vec<i32>
     {
         let mut v = Vec::new();
         let mut head = head;
@@ -51,7 +51,7 @@ impl ListNode {
         v
     }
     
-    fn len(mut head: &Option<Box<ListNode>>) -> usize {
+    pub fn len(mut head: &Option<Box<ListNode>>) -> usize {
         let mut l = 0;
         while let Some(x) = head {
             l += 1;

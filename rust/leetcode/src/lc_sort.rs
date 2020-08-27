@@ -1,7 +1,5 @@
 //! 排序相关
 
-use std::mem::swap;
-
 /// Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.  
 /// Note:  
 /// The number of elements initialized in nums1 and nums2 are m and n respectively.  
