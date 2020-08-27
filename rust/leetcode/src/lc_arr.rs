@@ -1,4 +1,5 @@
-use std::collections::{HashMap, HashSet}; 
+use std::collections::{HashMap, HashSet};
+use std::hash::{Hash, Hasher};
 
 macro_rules! impl_three_sum {
     ($Neg:ident, $Pos:ident, $V:ident, $Tgt: ident) => {
@@ -845,6 +846,114 @@ pub fn search_ii(nums: Vec<i32>, target: i32) -> bool {
     isexist
 }
 
+/// Permutations
+///
+/// Given a collection of numbers, return all possible permutations.
+/// For example, [1,2,3] have the following permutations: [1,2,3], [1,3,2], [2,1,3], [2,3,1],
+/// [3,1,2], and [3,2,1].
+pub fn permute(nums: Vec<i32>) -> Vec<Vec<i32>> {
+    let mut nums = nums;
+    nums.sort();
+    
+    let mut h = std::collections::hash_map::DefaultHasher::new();
+    nums.hash(&mut h);
+    let hv = h.finish();
+    
+    let mut res = Vec::with_capacity(nums.len() * nums.len());
+    res.push(nums.to_vec());
+    
+    loop {
+        next_permutation(&mut nums);
+        let mut h = std::collections::hash_map::DefaultHasher::new();
+        nums.hash(&mut h);
+        if h.finish() == hv {
+            break;
+        }
+        res.push(nums.to_vec());
+    }
+    
+    res
+}
+
+/// Conbinations
+/// Given two integers n and k, return all possible combinations of k numbers out of 1:::n.
+/// For example, If n = 4 and k = 2, a solution is:
+/// [
+/// [2,4],
+/// [3,4],
+/// [2,3],
+/// [1,2],
+/// [1,3],
+/// [1,4],
+/// ]
+pub fn combine(n: i32, k: i32) -> Vec<Vec<i32>> {
+    if n <= 0 || k <= 0 {
+        return Vec::new();
+    } else if k == 1 {
+        return (1..=n).map(|x|{vec![x]}).collect();
+    } else if k >= n {
+        return vec![(1..=n).collect()];
+    }    
+    
+    let mut res = Vec::with_capacity((n as usize) * (n as usize));
+    let mut nums: Vec<i32> = (0..k).map(|_| {1}).collect();
+    (k..n).for_each(|_| {nums.push(0);});
+    
+    let mut h = std::collections::hash_map::DefaultHasher::new();
+    nums.hash(&mut h);
+    let hv = h.finish();
+    
+    let mut tmp: Vec<i32> = (1..=k).collect();
+    res.push(tmp.to_vec());
+    
+    loop {
+        next_permutation(&mut nums);
+        
+        let mut h = std::collections::hash_map::DefaultHasher::new();
+        nums.hash(&mut h);
+        if hv == h.finish() {
+            break;
+        }
+        
+        tmp.clear();
+        nums.iter().enumerate().for_each(|(i, &x)| {if x > 0 {tmp.push((i+1) as i32);}});
+        res.push(tmp.to_vec());
+    }
+    
+    res
+}
+
+/// Letter Combinations of a Phone Number
+/// 
+/// Given a digit string, return all possible leer combinations that the number could represent.
+/// A mapping of digit to leers (just like on the telephone buons) is given below.
+pub fn letter_combinations(digits: String) -> Vec<String> {
+    if digits.is_empty() {
+        return vec![];
+    }
+    
+    const KEYBOARD: [&str;10] = [" ", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"];
+    let mut res = vec![String::from("")];
+    
+    digits.chars().for_each(|c| {
+        let d = c.to_digit(10).unwrap() as usize;
+        let (n, m) = (res.len(), KEYBOARD[d].len());
+        
+        let mut idx = 1;
+        let tmp = res.clone();
+        while idx < (m>>1) {res.append(&mut res.clone());idx <<= 1;}
+        while idx < m {res.append(&mut tmp.clone()); idx += 1;}
+        
+        (0..m).for_each(|idx| {
+            res.iter_mut().skip(idx * n).take(n).for_each(|x| {
+                x.push(KEYBOARD[d].chars().nth(idx).unwrap());
+            })
+        });
+    });
+    
+    res
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -1118,5 +1227,10 @@ mod tests {
         cases.iter().for_each(|x| {
             assert_eq!(x.1, super::search((x.0).0.to_vec(), (x.0).1), "case: {:?}", x.0);
         });
+    }
+    
+    #[test]
+    fn letter_combinations() {
+        println!("{:?}", super::letter_combinations("23".to_string()));
     }
 }
