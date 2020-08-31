@@ -301,6 +301,480 @@ pub fn surrounded_regions(board: &mut Vec<Vec<char>>) {
     });
 }
 
+/// Palindrome Partitioning
+/// Given a string s, partition s such that every substring of the partition is a palindrome.
+/// Return all possible palindrome partitioning of s.
+/// For example, given s = ”aab”, Return
+/// [
+/// ["aa","b"],
+/// ["a","a","b"]
+/// ]
+pub fn partition(s: String) -> Vec<Vec<String>> {
+    let mut res = Vec::new();
+    let mut output = Vec::new();
+
+    let s: Vec<u8> = s.chars().map(|x| {(x as u32) as u8}).collect();
+    palindrome_partition_dfs(&s, 0, &mut output, &mut res);
+
+    res
+}
+
+fn palindrome_partition_dfs<'a>(s: &'a Vec<u8>, start: usize, output: &mut Vec<&'a [u8]>, res: &mut Vec<Vec<String>>) {
+    if start == s.len() {
+        res.push(output.iter().map(|&x| {
+            x.iter().map(|&y| {
+                y as char
+            }).collect()
+        }).collect());
+        return;
+    }
+
+    for i in start..s.len() {
+        // 以s[start,i]为树头, 开始查找后续是否是回文, 共s.len()颗树
+        if is_palindrome(s, start, i) {
+            if let Some(x) = s.get(start..=i) {
+                output.push(x);
+            }
+            palindrome_partition_dfs(s, i+1, output, res);
+            output.pop();
+        }
+    }
+}
+
+fn is_palindrome(s: &Vec<u8>, start: usize, end: usize) -> bool {
+    let mut itr = s.iter().enumerate().skip(start)
+        .zip(s.iter().enumerate().skip(start).take(1+end.saturating_sub(start)).rev());
+    while let Some(x) = itr.next() {
+        if (x.0).0 < (x.1).0 {
+            if (x.0).1 != (x.1).1 {
+                return false;
+            }
+        } else {
+            break;
+        }
+    }
+
+    true
+}
+
+/// Unique Paths
+/// A robot is located at the top-left corner of a m × n grid (marked ’Start’ in the diagram below).
+/// e robot can only move either down or right at any point in time. e robot is trying to reach the
+/// boom-right corner of the grid (marked ’Finish’ in the diagram below).
+/// How many possible unique paths are there?
+/// Note: m and b will be at most 100.
+pub fn unique_paths(m: i32, n: i32) -> i32 {
+    // f[i][j] = f[i-1][j]+f[i][j-1]
+    let (min, max) = if m < n {(m as usize, n as usize)} else {(n as usize, m as usize)};
+    let mut f = Vec::with_capacity(min);
+    f.resize(min, 0);
+    
+    match min {
+        1 => 1,
+        _ => (0..max).fold(0, |_, _| {
+        f.iter_mut().skip(1).fold(1, |x, y| {*y = x + *y; *y})})
+    }
+}
+
+/// Unique Paths II
+/// Follow up for ”Unique Paths”:
+/// Now consider if some obstacles are added to the grids. How many unique paths would there be?
+/// An obstacle and empty space is marked as 1 and 0 respectively in the grid.
+/// For example,
+/// ere is one obstacle in the middle of a 3 × 3 grid as illustrated below.
+/// [
+/// [0,0,0],
+/// [0,1,0],
+/// [0,0,0]
+/// ]
+/// e total number of unique paths is 2.
+/// Note: m and n will be at most 100.
+pub fn unique_paths_with_obstacles(grid: Vec<Vec<i32>>) -> i32 {
+    if grid.first().is_none() || grid.first().unwrap().is_empty() {
+        return 0;
+    }
+    let (n, first) = match grid.first() { Some(x) => (x.len(), *x.first().unwrap() ^ 1), None => return 0 };
+    let mut f = vec![0; n];
+    
+    f[0] = first;
+    grid.iter().fold(0, |_, y| {
+        y.iter().zip(f.iter_mut()).enumerate().fold(0, |p, (i, (&ele, z))| {
+            *z = if ele > 0 {0} else {*z + if i == 0 {0} else {p}};
+            *z
+        })
+    })
+}
+
+struct Chessboard {
+    col: Vec<bool>,
+    p_diag: Vec<bool>,
+    c_diag: Vec<bool>,
+    queen_pos: Vec<usize>,
+    res: Vec<Vec<String>>,
+    count: i32,
+    is_count: bool
+}
+
+trait ChessFinish {
+    fn finish(&mut self);
+}
+
+impl Chessboard {
+    fn new(n: usize, is_count: bool) -> Self {
+        let (mut col, mut p_diag, mut c_diag, mut queen_pos) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+        col.resize(n, false);
+        p_diag.resize(n << 1, false);
+        c_diag.resize(n << 1, false);
+        queen_pos.resize(n, 0);
+        
+        Chessboard {
+            col, p_diag, c_diag, queen_pos, res: Vec::new(), count: 0, is_count,
+        }
+    }
+    
+    fn result(self) -> (Option<i32>, Option<Vec<Vec<String>>>) {
+        if self.is_count {(Some(self.count), None)} else {(None, Some(self.res))}
+    }
+    
+    fn dfs(&mut self, row: usize) {
+        if row == self.queen_pos.len() {
+            if self.is_count {
+                self.count += 1;
+            } else {
+                let mut tmp = Vec::with_capacity(self.queen_pos.len());
+                self.queen_pos.iter().for_each(|&pos| {
+                    let mut s = ".".repeat(pos);
+                    s.push('Q');
+                    s.push_str(".".repeat(self.queen_pos.len() - 1 - pos).as_str());
+                    tmp.push(s);
+                });
+                self.res.push(tmp);
+            }
+            return;
+        }
+
+        for col in 00..self.queen_pos.len() {
+            if !self.col[col] && !self.p_diag[row + col]
+                && !self.c_diag[row + self.queen_pos.len() - col] {
+                self.queen_pos[row] = col;
+                self.col[col] = true;
+                self.p_diag[row + col] = true;
+                self.c_diag[row + self.queen_pos.len() - col] = true;
+
+                self.dfs(row + 1);
+
+                self.col[col] = false;
+                self.p_diag[row + col] = false;
+                self.c_diag[row + self.queen_pos.len() - col] = false;
+            }
+        }
+    }
+}
+
+/// N-Queens
+/// e n-queens puzzle is the problem of placing n queens on an n × n chessboard such that no two
+/// queens aack each other.
+/// Given an integer n, return all distinct solutions to the n-queens puzzle.
+/// Each solution contains a distinct board configuration of the n-queens’ placement, where 'Q' and '.'
+/// both indicate a queen and an empty space respectively.
+/// For example, ere exist two distinct solutions to the 4-queens puzzle:
+/// [
+/// [".Q..", // Solution 1
+/// "...Q",
+/// "Q...",
+/// "..Q."],
+/// ["..Q.", // Solution 2
+/// "Q...",
+/// "...Q",
+/// ".Q.."]
+/// ]
+pub fn solve_nqueens(n: i32) -> Vec<Vec<String>> {
+    if n <= 0 {
+        return vec![vec![]];
+    }
+    
+    let mut chessboard = Chessboard::new(n as usize, false);
+    
+    chessboard.dfs(0);
+ 
+    chessboard.result().1.unwrap()
+}
+
+/// N-Queens II
+pub fn total_nqueens(n: i32) -> i32 {
+    if n <= 0 {
+        return 1;
+    }
+
+    let mut chessboard = Chessboard::new(n as usize, true);
+
+    chessboard.dfs(0);
+
+    chessboard.result().0.unwrap()
+}
+
+/// Restore IP Address
+/// Given a string containing only digits, restore it by returning all possible valid IP address combinations.
+/// For example: Given ”25525511135”,
+/// return [”255.255.11.135”, ”255.255.111.35”]. (Order does not matter)
+pub fn restore_ip_address(s: String) -> Vec<String> {
+    struct F(Vec<String>, fn(&Vec<u8>, usize, usize, String, f: &mut F));
+    let dfs = |s: &Vec<u8>, start: usize, step: usize, mut ip: String, f: &mut F| {
+        if s.len() == start && step == 4 {
+            ip.truncate(ip.len() - 1);
+            (f.0).push(ip.clone());
+            return;
+        } else if (s.len() - start) < (4 - step) {
+            return;
+        } else if (s.len() - start) > (4 - step) * 3 {
+            return;
+        }
+        
+        let mut num = 0;
+        for i in start..std::cmp::min(s.len(), start+3) {
+            num = num * 10 + (s[i] - b'0') as i32;
+            if num <= 255 {
+                ip.push(s[i] as char);
+                let mut tmp = ip.clone();
+                tmp.push('.');
+                (f.1)(s, i+1, step+1, tmp, f);
+            }
+            if num == 0 {break;}
+        }
+    };
+
+    let s = s.chars().map(|x| { (x as u32) as u8}).collect();
+    let mut f = F(Vec::new(), dfs);
+    dfs(&s, 0, 0, String::new(), &mut f);
+    
+    f.0
+}
+
+/// Combination Sum
+/// Given a set of candidate numbers (C) and a target number (T ), find all unique combinations in C where
+/// the candidate numbers sums to T .
+/// e same repeated number may be chosen from C unlimited number of times.
+/// Note:
+/// • All numbers (including target) will be positive integers.
+/// • Elements in a combination (a1; a2; :::; ak) must be in non-descending order. (ie, a1 > a2 > ::: > ak).
+/// • e solution set must not contain duplicate combinations.
+/// For example, given candidate set 2,3,6,7 and target 7, A solution set is:
+/// [7]
+/// [2, 2, 3]
+pub fn combination_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+    struct F(Vec<Vec<i32>>, fn(&Vec<i32>, i32, usize, &mut Vec<i32>, &mut F));
+    let dfs = |nums: &Vec<i32>, gap: i32, start: usize, inter: &mut Vec<i32>, f: &mut F| {
+        if gap == 0 {
+            f.0.push(inter.clone());
+            return;
+        }
+        
+        for i in start..nums.len() {
+            if gap < nums[i] {return;}
+            inter.push(nums[i]);
+            (f.1)(nums, gap-nums[i], i, inter, f);
+            inter.pop();
+        }
+    };
+    
+    let mut nums = nums;
+    nums.sort();
+    let mut f = F(Vec::new(), dfs);
+    let mut inter = Vec::new();
+    dfs(&nums, target, 0, &mut inter, &mut f);
+    
+    f.0
+}
+
+/// Combination Sum II
+/// Given a set of candidate numbers (C) and a target number (T ), find all unique combinations in C where
+/// the candidate numbers sums to T .
+/// e same repeated number may be chosen from C once number of times.
+/// Note:
+/// • All numbers (including target) will be positive integers.
+/// • Elements in a combination (a1; a2; :::; ak) must be in non-descending order. (ie, a1 > a2 > ::: > ak).
+/// • e solution set must not contain duplicate combinations.
+/// For example, given candidate set 10,1,2,7,6,1,5 and target 8, A solution set is:
+/// [1, 7]
+/// [1, 2, 5]
+/// [2, 6]
+/// [1, 1, 6]
+pub fn combination_sum_ii(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+    struct F(Vec<Vec<i32>>, fn(&Vec<i32>, i32, usize, &mut Vec<i32>, &mut F));
+    let dfs = |nums: &Vec<i32>, gap: i32, start: usize, inter: &mut Vec<i32>, f: &mut F| {
+        if gap == 0 {
+            f.0.push(inter.clone());
+            return;
+        }
+
+        let mut pre: i32 = 0;
+        for i in start..nums.len() {
+            if pre == nums[i] {continue;}
+            if gap < nums[i] {return;}
+            
+            pre = nums[i];
+            inter.push(nums[i]);
+            (f.1)(nums, gap-nums[i], i+1, inter, f);
+            
+            inter.pop();
+        }
+    };
+
+    let mut nums = nums;
+    nums.sort();
+    let mut f = F(Vec::new(), dfs);
+    let mut inter = Vec::new();
+    dfs(&nums, target, 0, &mut inter, &mut f);
+
+    f.0
+}
+
+/// Generate Parentheses
+/// Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+/// For example, given n = 3, a solution set is:
+/// "((()))", "(()())", "(())()", "()(())", "()()()"
+pub fn generate_parentheses(n: i32) -> Vec<String> {
+    struct F(Vec<String>, fn(i32, &mut String, i32, i32, &mut F));
+    let generate = |n: i32, s: &mut String, l: i32, r: i32, f: &mut F| {
+        if n == l {
+            let mut tmp = s.clone();
+            tmp.push_str(")".repeat((n-r) as usize).as_str());
+            (f.0).push(tmp);
+            return;
+        }
+        
+        s.push('(');
+        (f.1)(n, s, l+1, r, f);
+        s.pop();
+        
+        if l > r {
+            s.push(')');
+            (f.1)(n, s, l, r+1, f);
+            s.pop();
+        }
+    };
+    
+    if n <=0 {
+        vec!["".to_string()]
+    } else {
+        let mut f = F(Vec::new(), generate);
+        let mut inter = String::with_capacity((n << 1) as usize);
+        generate(n, &mut inter, 0, 0, &mut f);
+        
+        f.0
+    }
+}
+
+/// Sudoku Solver
+/// Write a program to solve a Sudoku puzzle by filling the empty cells.
+/// Empty cells are indicated by the character '.'.
+/// You may assume that there will be only one unique solution.
+pub fn solve_sudoku(board: &mut Vec<Vec<char>>) -> bool {
+    let check = |b: &Vec<Vec<char>>, x: usize, y: usize| {
+        for i in 0..9 { 
+            if i != x && b[i][y] == b[x][y] {
+                return false;
+            }
+        }
+        
+        for j in 0..9 {
+            if j != y && b[x][j] == b[x][y] {
+                return false;
+            }
+        }
+        
+        let (xs, xe, ys, ye) = (3*(x/3),3*(x/3 + 1), 3*(y/3), 3*(y/3+1));
+        for i in xs..xe {
+            for j in ys..ye {
+                if i != x && j != y && b[i][j] == b[x][y] {
+                    return false;
+                }
+            }
+        }
+        
+        true
+    };
+    
+    for i in 0..9 {
+        for j in 0..9 {
+            if board[i][j] == '.' {
+                for k in 0..9 {
+                    board[i][j] = (b'1' + k) as char;
+                    if check(&*board, i, j) && solve_sudoku(board) {
+                        return true;
+                    }
+                    board[i][j] = '.';
+                }
+                return false;
+            }
+        }
+    }
+    true
+}
+
+/// Word Search
+/// Given a 2D board and a word, find if the word exists in the grid.
+/// e word can be constructed from leers of sequentially adjacent cell, where "adjacent" cells are
+/// those horizontally or vertically neighbouring. e same leer cell may not be used more than once.
+/// For example, Given board =
+/// [
+/// ["ABCE"],
+/// ["SFCS"],
+/// ["ADEE"]
+/// ]
+/// word = "ABCCED", -> returns true,
+/// word = "SEE", -> returns true,
+/// word = "ABCB", -> returns false.
+pub fn exist(board: Vec<Vec<char>>, word: String) -> bool {
+    struct F(Vec<Vec<bool>>, fn(&Vec<Vec<char>>, &Vec<char>, usize, i32, i32, &mut F) -> bool);
+    let dfs = |board: &Vec<Vec<char>>, word: &Vec<char>, idx: usize, x: i32, y: i32,
+        f: &mut F| -> bool {
+        if idx == word.len() {
+            return true;
+        }
+        
+        if x < 0 || y < 0 || x >= (board.len() as i32) || y >= (board.first().unwrap().len() as i32) {
+            return false;
+        }
+        
+        let (x, y) = (x as usize, y as usize);
+        if (f.0)[x][y] {
+            return false;
+        }
+        
+        if board[x][y] != word[idx] {
+            return false;
+        }
+
+        (f.0)[x][y] = true;
+        let (x, y) = (x as i32, y as i32);
+        let res = (f.1)(board, word, idx+1, x-1, y, f) ||
+            (f.1)(board, word, idx+1, x+1,y, f) ||
+            (f.1)(board, word, idx+1, x, y-1, f) ||
+            (f.1)(board, word, idx+1, x, y+1, f);
+        (f.0)[x as usize][y as usize] = false;
+        res
+    };
+    
+    if board.is_empty() {
+        return word.is_empty();
+    }
+    
+    let (m, n) = (board.len(), board.first().unwrap().len());
+    let mut f = F(vec![vec![false; n]; m], dfs);
+    let word: Vec<char> = word.chars().collect();
+    let (m, n) = (m as i32, n as i32);
+    for i in 0..m {
+        for j in 0..n {
+            if dfs(&board, &word, 0, i, j, &mut f) {
+                return true;
+            }
+        }
+    }
+    
+    false
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -341,8 +815,50 @@ mod tests {
         ];
 
         cases.iter().for_each(|x| {
-            dbg!(super::find_ladders((x.0).0.to_string(), (x.0).1.to_string(),
-                                    (x.0).2.iter().map(|ele| {ele.to_string()}).collect()));
+            super::find_ladders((x.0).0.to_string(), (x.0).1.to_string(),
+                                    (x.0).2.iter().map(|ele| {ele.to_string()}).collect());
         });
+    }
+    
+    #[test]
+    fn restore_ip_address() {
+        let cases = [
+            ("25525511135", vec!["255.255.111.35", "255.255.11.135"]),
+        ];
+        
+        cases.iter().for_each(|x| {
+            let mut left = x.1.clone();
+            left.sort();
+            let mut right = super::restore_ip_address(x.0.to_string());
+            right.sort();
+            assert_eq!(left, right, "case: {:?}", x.0);
+        })
+    }
+    
+    #[test]
+    fn combination_sum() {
+        let cases = [
+            ((vec![8,7,4,3], 11), vec![vec![3,4,4],vec![3,8],vec![4,7]]),
+        ];
+        
+        cases.iter().for_each(|x| {
+            let mut left = x.1.clone();
+            left.sort();
+            let mut right = super::combination_sum((x.0).0.clone(), (x.0).1);
+            right.sort();
+            assert_eq!(left, right, "case: {:?}", x.0);
+        })
+    }
+    
+    #[test]
+    fn exist() {
+        let cases = [
+            ((vec![vec!['A','B','C','E'],vec!['S','F','C','S'],vec!['A','D','E','E']], "SEE"), true),
+            ((vec![vec!['a','b'],vec!['c','d']], "acdb"), true),
+        ];
+        
+        cases.iter().for_each(|x| {
+            assert_eq!(x.1, super::exist((x.0).0.clone(), (x.0).1.to_string()), "case: {:?}", x.0);
+        })
     }
 }
