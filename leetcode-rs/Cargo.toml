@@ -1,0 +1,32 @@
+[package]
+name = "leetcode-rs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace]
+
+members = [
+    "leetcode-pm",
+    "leetcode-meta",
+]
+
+[dependencies]
+clap = { version = "~3.1.0" }
+leetcode-pm = { path = "./leetcode-pm" }
+leetcode-meta = { path = "./leetcode-meta" }
+syn = { version = "1.0.95", features = ["full", "extra-traits"] }
+quote = { version = "1.0.18" }
+proc-macro2 = { version = "1.0.39" }
+prettyplease = { version = "0.1.10" }
+lazy_static = {version = "1.4.0" }
+ctor = { version = "0.1.22" }
+regex = { version = "1.5.6" }
+
+[build-dependencies]
+leetcode-meta = { path = "./leetcode-meta" }
+
+[features]
+default = ["inject"]
+inject = []

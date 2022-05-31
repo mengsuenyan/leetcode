@@ -1,0 +1,16 @@
+[package]
+name = "leetcode-pm"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "1.0.95", features = ["full", "extra-traits"] }
+quote = { version = "1.0.18" }
+proc-macro2 = { version = "1.0.39" }
+prettyplease = { version = "0.1.10" }
+leetcode-meta = { path = "../leetcode-meta" }
