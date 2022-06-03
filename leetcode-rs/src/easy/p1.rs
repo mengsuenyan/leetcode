@@ -1,6 +1,7 @@
-use std::cell::RefCell;
 use crate::prelude::*;
-use std::collections::HashMap;
+use std::cell::RefCell;
+use std::cmp::Ordering;
+use std::collections::{HashMap, VecDeque};
 use std::rc::Rc;
 use std::sync::{Arc, RwLock};
 
@@ -241,18 +242,15 @@ pub fn is_valid(s: String) -> bool {
 // Definition for singly-linked list.
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct ListNode {
-  pub val: i32,
-  pub next: Option<Box<ListNode>>
+    pub val: i32,
+    pub next: Option<Box<ListNode>>,
 }
 
 impl ListNode {
-  #[inline]
-  pub fn new(val: i32) -> Self {
-    ListNode {
-      next: None,
-      val
+    #[inline]
+    pub fn new(val: i32) -> Self {
+        ListNode { next: None, val }
     }
-  }
 
     pub fn from_slice(v: &[i32]) -> Option<Box<ListNode>> {
         let mut head = Box::new(ListNode::new(0));
@@ -269,7 +267,9 @@ impl ListNode {
         loop {
             s.push_str(format!("{}->", list.val).as_str());
             match list.next.as_deref() {
-                None => {break;}
+                None => {
+                    break;
+                }
                 Some(l) => {
                     list = l;
                 }
@@ -286,13 +286,13 @@ impl ListNode {
 }
 
 #[inject_description(
-problems = "PROBLEMS",
-id = "20",
-title = "Merge Two Sorted Lists",
-topic = "algorithm",
-difficulty = "easy",
-tags = "recursion, LinkedList",
-note = "You are given the heads of two sorted linked lists list1 and list2.
+    problems = "PROBLEMS",
+    id = "20",
+    title = "Merge Two Sorted Lists",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "recursion, LinkedList",
+    note = "You are given the heads of two sorted linked lists list1 and list2.
 
 Merge the two lists in a one sorted list. The list should be made by splicing together the nodes of the first two lists.
 
@@ -305,9 +305,12 @@ Both list1 and list2 are sorted in non-decreasing order.
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/merge-two-sorted-lists
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
-pub fn merge_two_lists(mut list1: Option<Box<ListNode>>, mut list2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+pub fn merge_two_lists(
+    mut list1: Option<Box<ListNode>>,
+    mut list2: Option<Box<ListNode>>,
+) -> Option<Box<ListNode>> {
     let mut head = Box::new(ListNode::new(0));
     let mut tail = &mut head;
     'outloop: loop {
@@ -342,15 +345,14 @@ pub fn merge_two_lists(mut list1: Option<Box<ListNode>>, mut list2: Option<Box<L
     head.next.take()
 }
 
-
 #[inject_description(
-problems = "PROBLEMS",
-id = "26",
-title = "Remove Duplicates from Sorted Array",
-topic = "algorithm",
-difficulty = "easy",
-tags = "array,TwoPointers",
-note = "Given an integer array nums sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once. The relative order of the elements should be kept the same.
+    problems = "PROBLEMS",
+    id = "26",
+    title = "Remove Duplicates from Sorted Array",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "array,TwoPointers",
+    note = "Given an integer array nums sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once. The relative order of the elements should be kept the same.
 
 Since it is impossible to change the length of the array in some languages, you must instead have the result be placed in the first part of the array nums. More formally, if there are k elements after removing the duplicates, then the first k elements of nums should hold the final result. It does not matter what you leave beyond the first k elements.
 
@@ -360,7 +362,7 @@ Do not allocate extra space for another array. You must do this by modifying the
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/remove-duplicates-from-sorted-array
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn remove_duplicates(nums: &mut Vec<i32>) -> i32 {
     let (mut new_len, mut read) = (nums.len(), 1);
@@ -387,13 +389,13 @@ pub fn remove_duplicates(nums: &mut Vec<i32>) -> i32 {
 }
 
 #[inject_description(
-problems = "PROBLEMS",
-id = "27",
-title = "Remove Element",
-topic = "algorithm",
-difficulty = "easy",
-tags = "array, TwoPointers",
-note = "Given an integer array nums and an integer val, remove all occurrences of val in nums in-place. The relative order of the elements may be changed.
+    problems = "PROBLEMS",
+    id = "27",
+    title = "Remove Element",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "array, TwoPointers",
+    note = "Given an integer array nums and an integer val, remove all occurrences of val in nums in-place. The relative order of the elements may be changed.
 
 Since it is impossible to change the length of the array in some languages, you must instead have the result be placed in the first part of the array nums. More formally, if there are k elements after removing the duplicates, then the first k elements of nums should hold the final result. It does not matter what you leave beyond the first k elements.
 
@@ -409,7 +411,7 @@ Constraints:
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/remove-element
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
     let (mut new_len, mut read) = (nums.len(), 0);
@@ -419,7 +421,7 @@ pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
         let mut cur = nums.as_mut_ptr();
         while read < new_len {
             if cur.read() == val {
-                cur.swap(first.offset((new_len - 1) as isize));
+                cur.swap(first.add(new_len - 1));
                 new_len -= 1;
             } else {
                 cur = cur.offset(1);
@@ -432,15 +434,14 @@ pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
     new_len as i32
 }
 
-
 #[inject_description(
-problems = "PROBLEMS",
-id = "28",
-title = "Implement strStr()",
-topic = "algorithm",
-difficulty = "easy",
-tags = "TwoPointers, String, StringMatching",
-note = "Implement strStr().
+    problems = "PROBLEMS",
+    id = "28",
+    title = "Implement strStr()",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "TwoPointers, String, StringMatching",
+    note = "Implement strStr().
 
 Given two strings needle and haystack, return the index of the first occurrence of needle in haystack, or -1 if needle is not part of haystack.
 
@@ -456,11 +457,11 @@ haystack and needle consist of only lowercase English characters.
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/implement-strstr
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn str_str(haystack: String, needle: String) -> i32 {
-    use std::hash::{Hash, Hasher};
     use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
 
     if needle.is_empty() {
         0
@@ -485,21 +486,20 @@ pub fn str_str(haystack: String, needle: String) -> i32 {
     }
 }
 
-
 #[inject_description(
-problems = "PROBLEMS",
-id = "35",
-title = "Search Insert Position",
-topic = "algorithm",
-difficulty = "easy",
-tags = "Array, BinarySearch",
-note = "Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+    problems = "PROBLEMS",
+    id = "35",
+    title = "Search Insert Position",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "Array, BinarySearch",
+    note = "Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
 
 You must write an algorithm with O(log n) runtime complexity.
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/search-insert-position
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn search_insert(nums: Vec<i32>, target: i32) -> i32 {
     for (i, &e) in nums.iter().enumerate() {
@@ -512,38 +512,42 @@ pub fn search_insert(nums: Vec<i32>, target: i32) -> i32 {
 }
 
 #[inject_description(
-problems = "PROBLEMS",
-id = "53",
-title = "Maximum Subarray",
-topic = "algorithm",
-difficulty = "easy",
-tags = "Array,DivideAndConquer, DynamicProgramming",
-note = "Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
+    problems = "PROBLEMS",
+    id = "53",
+    title = "Maximum Subarray",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "Array,DivideAndConquer, DynamicProgramming",
+    note = "Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
 
 A subarray is a contiguous part of an array.
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/maximum-subarray
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn max_sub_array(nums: Vec<i32>) -> i32 {
     // F(n) = max(F(n-1)+A[n], A[n])
-    let f = *nums.first().unwrap_or_else(|| unreachable!("nums need to contain at least one number"));
-    nums.into_iter().skip(1).fold((f, f), |(pre_max, f), e| {
-        let f = std::cmp::max(f + e, e);
-        (std::cmp::max(f, pre_max), f)
-    }).0
+    let f = *nums
+        .first()
+        .unwrap_or_else(|| unreachable!("nums need to contain at least one number"));
+    nums.into_iter()
+        .skip(1)
+        .fold((f, f), |(pre_max, f), e| {
+            let f = std::cmp::max(f + e, e);
+            (std::cmp::max(f, pre_max), f)
+        })
+        .0
 }
 
-
 #[inject_description(
-problems = "PROBLEMS",
-id = "58",
-title = "Length of Last Word",
-topic = "algorithm",
-difficulty = "easy",
-tags = "string",
-note = "Given a string s consisting of words and spaces, return the length of the last word in the string.
+    problems = "PROBLEMS",
+    id = "58",
+    title = "Length of Last Word",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "string",
+    note = "Given a string s consisting of words and spaces, return the length of the last word in the string.
 
 A word is a maximal substring consisting of non-space characters only.
 
@@ -554,7 +558,7 @@ There will be at least one word in s.
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/length-of-last-word
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn length_of_last_word(s: String) -> i32 {
     let mut len = 0;
@@ -569,15 +573,14 @@ pub fn length_of_last_word(s: String) -> i32 {
     len
 }
 
-
 #[inject_description(
-problems = "PROBLEMS",
-id = "66",
-title = "Plus One",
-topic = "algorithm",
-difficulty = "easy",
-tags = "array, math",
-note = "You are given a large integer represented as an integer array digits, where each digits[i] is the ith digit of the integer. The digits are ordered from most significant to least significant in left-to-right order. The large integer does not contain any leading 0's.
+    problems = "PROBLEMS",
+    id = "66",
+    title = "Plus One",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "array, math",
+    note = "You are given a large integer represented as an integer array digits, where each digits[i] is the ith digit of the integer. The digits are ordered from most significant to least significant in left-to-right order. The large integer does not contain any leading 0's.
 
 Increment the large integer by one and return the resulting array of digits.
 
@@ -588,7 +591,7 @@ digits does not contain any leading 0's.
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/plus-one
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn plus_one(mut digits: Vec<i32>) -> Vec<i32> {
     let mut carry = 1;
@@ -609,15 +612,14 @@ pub fn plus_one(mut digits: Vec<i32>) -> Vec<i32> {
     digits
 }
 
-
 #[inject_description(
-problems = "PROBLEMS",
-id = "67",
-title = "Add Binary",
-topic = "algorithm",
-difficulty = "easy",
-tags = "BitManipulation, Math, string, Simulation",
-note = "Given two binary strings a and b, return their sum as a binary string.
+    problems = "PROBLEMS",
+    id = "67",
+    title = "Add Binary",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "BitManipulation, Math, string, Simulation",
+    note = "Given two binary strings a and b, return their sum as a binary string.
 
 Constraints:
 1 <= a.length, b.length <= 10^4
@@ -627,30 +629,65 @@ Each string does not contain leading zeros except for the zero itself.
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/add-binary
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
- ",
+ "
 )]
 pub fn add_binary(a: String, b: String) -> String {
-    let (mut long, short) = if a.len() > b.len() {(a, b)} else {(b,a)};
+    let (mut long, short) = if a.len() > b.len() { (a, b) } else { (b, a) };
     let mut is_carry = false;
     unsafe {
-        for (l, &s) in long.as_bytes_mut().iter_mut().rev().zip(short.as_bytes().iter().rev()) {
+        for (l, &s) in long
+            .as_bytes_mut()
+            .iter_mut()
+            .rev()
+            .zip(short.as_bytes().iter().rev())
+        {
             let (cur, carry) = match (*l, s) {
-                (b'0', b'0') => (if is_carry {b'1'} else {b'0'}, false),
-                (b'0', b'1') | (b'1', b'0') => if is_carry {(b'0', true)} else {(b'1', false)},
-                (b'1', b'1') => if is_carry {(b'1', true)} else {(b'0', true)},
+                (b'0', b'0') => (if is_carry { b'1' } else { b'0' }, false),
+                (b'0', b'1') | (b'1', b'0') => {
+                    if is_carry {
+                        (b'0', true)
+                    } else {
+                        (b'1', false)
+                    }
+                }
+                (b'1', b'1') => {
+                    if is_carry {
+                        (b'1', true)
+                    } else {
+                        (b'0', true)
+                    }
+                }
                 _ => unreachable!(),
             };
-            *l =cur;
+            *l = cur;
             is_carry = carry;
         }
 
-        long.as_bytes_mut().iter_mut().rev().skip(short.len()).for_each(|l| {
-            *l = match *l {
-                b'0' => if is_carry {is_carry = false; b'1'} else {b'0'},
-                b'1' => if is_carry {is_carry = true; b'0'} else {b'1'},
-                _ => unreachable!(),
-            }
-        });
+        long.as_bytes_mut()
+            .iter_mut()
+            .rev()
+            .skip(short.len())
+            .for_each(|l| {
+                *l = match *l {
+                    b'0' => {
+                        if is_carry {
+                            is_carry = false;
+                            b'1'
+                        } else {
+                            b'0'
+                        }
+                    }
+                    b'1' => {
+                        if is_carry {
+                            is_carry = true;
+                            b'0'
+                        } else {
+                            b'1'
+                        }
+                    }
+                    _ => unreachable!(),
+                }
+            });
     }
 
     if is_carry {
@@ -660,15 +697,14 @@ pub fn add_binary(a: String, b: String) -> String {
     long
 }
 
-
 #[inject_description(
-problems = "PROBLEMS",
-id = "69",
-title = "Sqrt(x)",
-topic = "algorithm",
-difficulty = "easy",
-tags = "math, BinarySearch",
-note = "Given a non-negative integer x, compute and return the square root of x.
+    problems = "PROBLEMS",
+    id = "69",
+    title = "Sqrt(x)",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "math, BinarySearch",
+    note = "Given a non-negative integer x, compute and return the square root of x.
 
 Since the return type is an integer, the decimal digits are truncated, and only the integer part of the result is returned.
 
@@ -676,7 +712,7 @@ Note: You are not allowed to use any built-in exponent function or operator, su
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/sqrtx
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn my_sqrt(x: i32) -> i32 {
     let x = x as u64;
@@ -685,12 +721,10 @@ pub fn my_sqrt(x: i32) -> i32 {
     while (right - left) > 1 {
         let m = (left + right) >> 1;
         let m2 = m * m;
-        if m2 > x {
-            right = m;
-        } else if m2 < x {
-            left = m
-        } else {
-            return m as i32;
+        match m2.cmp(&x) {
+            Ordering::Less => {left = m;}
+            Ordering::Equal => {return m as i32;}
+            Ordering::Greater => {right = m;}
         }
     }
 
@@ -703,13 +737,13 @@ pub fn my_sqrt(x: i32) -> i32 {
 }
 
 #[inject_description(
-problems = "PROBLEMS",
-id = "70",
-title = "Climbing Stairs",
-topic = "algorithm",
-difficulty = "easy",
-tags = "Memoization, math, DynamicProgramming",
-note = "You are climbing a staircase. It takes n steps to reach the top.
+    problems = "PROBLEMS",
+    id = "70",
+    title = "Climbing Stairs",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "Memoization, math, DynamicProgramming",
+    note = "You are climbing a staircase. It takes n steps to reach the top.
 
 Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
 
@@ -718,23 +752,21 @@ Constraints:
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/climbing-stairs
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn climb_stairs(n: i32) -> i32 {
     // c[i] = c[i-1] + c[i-2]
-    (1..=n).fold((0, 1), |(prev, cur), _| {
-        (cur, cur + prev)
-    }).1
+    (1..=n).fold((0, 1), |(prev, cur), _| (cur, cur + prev)).1
 }
 
 #[inject_description(
-problems = "PROBLEMS",
-id = "83",
-title = "Remove Duplicates from Sorted List",
-topic = "algorithm",
-difficulty = "easy",
-tags = "LinkedList",
-note = "Given the head of a sorted linked list, delete all duplicates such that each element appears only once. Return the linked list sorted as well.
+    problems = "PROBLEMS",
+    id = "83",
+    title = "Remove Duplicates from Sorted List",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "LinkedList",
+    note = "Given the head of a sorted linked list, delete all duplicates such that each element appears only once. Return the linked list sorted as well.
 
 Constraints:
 The number of nodes in the list is in the range [0, 300].
@@ -743,13 +775,17 @@ The list is guaranteed to be sorted in ascending order.
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/remove-duplicates-from-sorted-list
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn delete_duplicates(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
     let mut node = head.as_mut();
     while let Some(cur) = node {
         if Some(cur.val) == cur.next.as_ref().map(|x| x.val) {
-            let x= cur.next.as_mut().map(|x| x.next.take()).unwrap_or_else(|| unreachable!());
+            let x = cur
+                .next
+                .as_mut()
+                .map(|x| x.next.take())
+                .unwrap_or_else(|| unreachable!());
             cur.next = x;
             node = Some(cur);
         } else {
@@ -761,13 +797,13 @@ pub fn delete_duplicates(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode
 }
 
 #[inject_description(
-problems = "PROBLEMS",
-id = "88",
-title = "Merge Sorted Array",
-topic = "algorithm",
-difficulty = "easy",
-tags = "array, TwoPointers, Sorting",
-note = "You are given two integer arrays nums1 and nums2, sorted in non-decreasing order, and two integers m and n, representing the number of elements in nums1 and nums2 respectively.
+    problems = "PROBLEMS",
+    id = "88",
+    title = "Merge Sorted Array",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "array, TwoPointers, Sorting",
+    note = "You are given two integer arrays nums1 and nums2, sorted in non-decreasing order, and two integers m and n, representing the number of elements in nums1 and nums2 respectively.
 
 Merge nums1 and nums2 into a single array sorted in non-decreasing order.
 
@@ -775,8 +811,9 @@ The final sorted array should not be returned by the function, but instead be st
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/merge-sorted-array
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
+#[allow(clippy::ptr_arg)]
 pub fn merge(nums1: &mut Vec<i32>, m: i32, nums2: &mut Vec<i32>, n: i32) {
     let (mut m, mut n) = (m as usize, n as usize);
     nums1.resize((m + n) as usize, Default::default());
@@ -820,49 +857,97 @@ impl TreeNode {
         TreeNode {
             val,
             left: None,
-            right: None
+            right: None,
         }
     }
 
-    pub fn from_slice(v: &[i32]) -> Option<Rc<RefCell<TreeNode>>> {
-        match v.first() {
-            None => {None}
-            Some(&val) => {
-                if val == i32::MAX {
+    pub fn from_slice(mut v: &[i32]) -> Option<Rc<RefCell<TreeNode>>> {
+        if v.is_empty() {
+            return None;
+        }
+
+        let mut stk = VecDeque::new();
+        let root = Rc::new(RefCell::new(TreeNode::new(*v.first().unwrap())));
+        stk.push_back(root.clone());
+        v = &v[1..];
+
+        while let Some(node) = stk.pop_front() {
+            let (l, r) = (v.get(0), v.get(1));
+            match l {
+                None => {break;}
+                Some(&val) => {
                     // `i32::MAX` represent `null` Node, just for test conveniently
-                    None
-                } else {
-                    let mut parent = TreeNode::new(val);
-                    let (left, right) = if v.len() > 2 {
-                        (Self::from_slice(&v[1..]), Self::from_slice(&v[2..]))
-                    } else if v.len() > 1 {
-                        (Self::from_slice(&v[1..]), None)
-                    } else {
-                        (None, None)
-                    };
+                    if val != i32::MAX {
+                        let left = Rc::new(RefCell::new(TreeNode::new(val)));
+                        node.borrow_mut().left = Some(left.clone());
+                        stk.push_back(left);
+                    }
+                    v = &v[1..];
+                }
+            }
 
-                    parent.left = left;
-                    parent.right = right;
-
-                    Some(Rc::new(RefCell::new(parent)))
+            match r {
+                None => {break;}
+                Some(&val) => {
+                    if val != i32::MAX {
+                        let right = Rc::new(RefCell::new(TreeNode::new(val)));
+                        node.borrow_mut().right = Some(right.clone());
+                        stk.push_back(right);
+                    }
+                    v = &v[1..];
                 }
             }
         }
+
+        Some(root)
+    }
+
+    /// Just for test
+    /// The sequence is from top to bottom and left to right. If the leaf is `null` that will fill `i32::MAX`
+    pub fn to_vec(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
+        let (mut res, mut stk) = (Vec::new(), VecDeque::new());
+        stk.push_back(root);
+
+        while let Some(ele) = stk.pop_front() {
+            match ele {
+                None => {
+                    // just for test conveniently
+                    res.push(i32::MAX);
+                }
+                Some(node) => {
+                    res.push(node.borrow().val);
+                    stk.push_back(node.borrow().left.clone());
+                    stk.push_back(node.borrow().right.clone());
+                }
+            }
+        }
+
+        // discard all `null` node in the tail.
+
+        while let Some(&ele) = res.last() {
+            if ele == i32::MAX {
+                res.pop();
+            } else {
+                break;
+            }
+        }
+
+        res
     }
 }
 
 #[inject_description(
-problems = "PROBLEMS",
-id = "94",
-title = "Binary Tree Inorder Traversal",
-topic = "algorithm",
-difficulty = "easy",
-tags = "Stack, Tree, DepthFirstSearch, BinaryTree",
-note = "Given the root of a binary tree, return the inorder traversal of its nodes' values.
+    problems = "PROBLEMS",
+    id = "94",
+    title = "Binary Tree Inorder Traversal",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "Stack, Tree, DepthFirstSearch, BinaryTree",
+    note = "Given the root of a binary tree, return the inorder traversal of its nodes' values.
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/binary-tree-inorder-traversal
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn inorder_traversal(mut root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
     let (mut stk, mut res) = (Vec::new(), Vec::new());
@@ -885,31 +970,40 @@ pub fn inorder_traversal(mut root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
 }
 
 #[inject_description(
-problems = "PROBLEMS",
-id = "100",
-title = "Same Tree",
-topic = "algorithm",
-difficulty = "easy",
-tags = "Tree, DepthFirstSearch, BreadthFirstSearch, BinaryTree",
-note = "Given the roots of two binary trees p and q, write a function to check if they are the same or not.
+    problems = "PROBLEMS",
+    id = "100",
+    title = "Same Tree",
+    topic = "algorithm",
+    difficulty = "easy",
+    tags = "Tree, DepthFirstSearch, BreadthFirstSearch, BinaryTree",
+    note = "Given the roots of two binary trees p and q, write a function to check if they are the same or not.
 
 Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
 
 来源：力扣（LeetCode）
 链接：https://leetcode.cn/problems/same-tree
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。",
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。"
 )]
 pub fn is_same_tree(p: Option<Rc<RefCell<TreeNode>>>, q: Option<Rc<RefCell<TreeNode>>>) -> bool {
     if p.is_none() && q.is_none() {
         true
     } else {
-        p == q
+        p.as_ref().map(|x| x.borrow().val) == q.as_ref().map(|x| x.borrow().val)
             && is_same_tree(
-            p.as_ref().map(|x| x.borrow().left.clone()).unwrap_or_default(),
-            q.as_ref().map(|x| x.borrow().left.clone()).unwrap_or_default(),
-        ) && is_same_tree(
-            p.as_ref().map(|x| x.borrow().right.clone()).unwrap_or_default(),
-            q.as_ref().map(|x| x.borrow().right.clone()).unwrap_or_default(),
-        )
+                p.as_ref()
+                    .map(|x| x.borrow().left.clone())
+                    .unwrap_or_default(),
+                q.as_ref()
+                    .map(|x| x.borrow().left.clone())
+                    .unwrap_or_default(),
+            )
+            && is_same_tree(
+                p.as_ref()
+                    .map(|x| x.borrow().right.clone())
+                    .unwrap_or_default(),
+                q.as_ref()
+                    .map(|x| x.borrow().right.clone())
+                    .unwrap_or_default(),
+            )
     }
 }
