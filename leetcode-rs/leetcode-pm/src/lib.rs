@@ -1,8 +1,54 @@
+use std::collections::hash_map::DefaultHasher;
 use leetcode_meta::{Difficulty, Id, Problem, Tag, Tags, Topic};
 use proc_macro2::{Span, TokenStream, TokenTree};
 use quote::ToTokens;
 use std::collections::HashSet;
-use syn::ItemFn;
+use std::hash::{Hash, Hasher};
+use syn::{Type, Item, Result};
+
+#[derive(Hash)]
+struct ParseItemType(Item);
+
+impl ParseItemType {
+    fn new(tokens: proc_macro::TokenStream) -> Result<Self> {
+        syn::parse::<Item>(tokens).map(|x| Self(x))
+    }
+
+    fn ident_name(&self) -> String {
+        match &self.0 {
+            Item::Fn(x) => {x.sig.ident.to_string()}
+            Item::Struct(x) => {x.ident.to_string()}
+            Item::Impl(x) => {
+                match x.self_ty.as_ref() {
+                    Type::Path(y) => {
+                        y.path.segments.last().unwrap().ident.to_string()
+                    }
+                    y @ _ => {
+                        panic!("Current doesn't support the type for ItemImpl: {:?}", y)
+                    }
+                }
+            }
+            x @ _ => {
+                panic!("Current doesn't support the item: {:?}", x)
+            }
+        }
+    }
+
+    fn get_init_name(&self) -> String {
+        let mut hasher = DefaultHasher::new();
+        "init_lpm_".hash(&mut hasher);
+        self.hash(&mut hasher);
+
+        format!("{}_{:0>16x}", self.ident_name(), hasher.finish())
+    }
+
+}
+
+impl ToTokens for ParseItemType {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        self.0.to_tokens(tokens)
+    }
+}
 
 /// Only used for function
 ///
@@ -31,15 +77,13 @@ pub fn inject_description(
     let solution = prettyplease::unparse(&syn::parse(item.clone()).unwrap());
     problem.set_solution(solution);
 
-    let ast = syn::parse::<ItemFn>(item).unwrap();
+    let ast = ParseItemType::new(item).unwrap();
     if problem.title().is_empty() {
-        problem.set_title(ast.sig.ident.to_string());
+        problem.set_title(ast.ident_name());
     }
 
     if let Some(problems) = problems {
-        let mut name = "init_lpm_".to_string();
-        name.push_str(ast.sig.ident.to_string().as_str());
-        let name = syn::Ident::new(name.as_str(), Span::call_site());
+        let name = syn::Ident::new(ast.get_init_name().as_str(), Span::call_site());
 
         let problems = syn::Ident::new(problems.as_str(), Span::call_site());
         let init_insert = quote::quote! {

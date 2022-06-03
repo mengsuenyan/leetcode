@@ -90,21 +90,29 @@ fn test_is_valid() {
 #[test]
 fn test_merge_two_lists() {
     let cases = vec![
-        (vec![1,2,4], vec![1,3,4], vec![1,1,2,3,4,4]),
+        (vec![1, 2, 4], vec![1, 3, 4], vec![1, 1, 2, 3, 4, 4]),
         (vec![], vec![], vec![]),
         (vec![], vec![0], vec![0]),
     ];
 
     for (i, (list1, list2, output)) in cases.into_iter().enumerate() {
-        assert_eq!(p1::merge_two_lists(ListNode::from_slice(list1.as_slice()), ListNode::from_slice(list2.as_slice())), ListNode::from_slice(output.as_slice()), "case {} failed", i);
+        assert_eq!(
+            p1::merge_two_lists(
+                ListNode::from_slice(list1.as_slice()),
+                ListNode::from_slice(list2.as_slice())
+            ),
+            ListNode::from_slice(output.as_slice()),
+            "case {} failed",
+            i
+        );
     }
 }
 
 #[test]
 fn test_remove_duplicates() {
     let cases = vec![
-        (vec![1,1,2], vec![1,2]),
-        (vec![0,0,1,1,2,2,3,3,4], vec![0,1,2,3,4]),
+        (vec![1, 1, 2], vec![1, 2]),
+        (vec![0, 0, 1, 1, 2, 2, 3, 3, 4], vec![0, 1, 2, 3, 4]),
         (vec![], vec![]),
         (vec![1], vec![1]),
     ];
@@ -123,8 +131,8 @@ fn test_remove_element() {
         ((vec![1], 1), vec![]),
         ((vec![1, 2], 1), vec![2]),
         ((vec![1, 1, 1], 1), vec![]),
-        ((vec![3,2,2,3], 3), vec![2,2]),
-        ((vec![0,1,2,2,3,0,4,2], 2), vec![0,1,4,0,3]),
+        ((vec![3, 2, 2, 3], 3), vec![2, 2]),
+        ((vec![0, 1, 2, 2, 3, 0, 4, 2], 2), vec![0, 1, 4, 0, 3]),
     ];
 
     for (i, ((mut input, target), output)) in cases.into_iter().enumerate() {
@@ -143,29 +151,39 @@ fn test_str_str() {
     ];
 
     for (i, ((src, dst), output)) in cases.into_iter().enumerate() {
-        assert_eq!(p1::str_str(src.to_string(), dst.to_string()), output, "case {} failed", i);
+        assert_eq!(
+            p1::str_str(src.to_string(), dst.to_string()),
+            output,
+            "case {} failed",
+            i
+        );
     }
 }
 
 #[test]
 fn test_search_insert() {
     let cases = vec![
-        ((vec![1,3,5,6], 5), 2),
-        ((vec![1,3,5,6], 2), 1),
-        ((vec![1,3,5,6], 7), 4),
+        ((vec![1, 3, 5, 6], 5), 2),
+        ((vec![1, 3, 5, 6], 2), 1),
+        ((vec![1, 3, 5, 6], 7), 4),
         ((vec![], 2), 0),
     ];
     for (i, ((input, target), output)) in cases.into_iter().enumerate() {
-        assert_eq!(p1::search_insert(input, target), output, "case {} failed", i);
+        assert_eq!(
+            p1::search_insert(input, target),
+            output,
+            "case {} failed",
+            i
+        );
     }
 }
 
 #[test]
 fn test_max_sub_array() {
     let cases = vec![
-        (vec![-2,1,-3,4,-1,2,1,-5,4], 6),
+        (vec![-2, 1, -3, 4, -1, 2, 1, -5, 4], 6),
         (vec![1], 1),
-        (vec![5,4,-1,7,8], 23),
+        (vec![5, 4, -1, 7, 8], 23),
     ];
 
     for (i, (input, output)) in cases.into_iter().enumerate() {
@@ -182,16 +200,20 @@ fn test_length_of_last_word() {
     ];
 
     for (i, (input, output)) in cases.into_iter().enumerate() {
-        assert_eq!(p1::length_of_last_word(input.to_string()), output, "case {} failed", i);
+        assert_eq!(
+            p1::length_of_last_word(input.to_string()),
+            output,
+            "case {} failed",
+            i
+        );
     }
-
 }
 
 #[test]
 fn test_plus_one() {
     let cases = vec![
-        (vec![1,2,3], vec![1,2,4]),
-        (vec![4,3,2,1], vec![4,3,2,2]),
+        (vec![1, 2, 3], vec![1, 2, 4]),
+        (vec![4, 3, 2, 1], vec![4, 3, 2, 2]),
         (vec![0], vec![1]),
         (vec![9], vec![1, 0]),
     ];
@@ -211,7 +233,12 @@ fn test_add_binary() {
     ];
 
     for (i, ((a, b), output)) in cases.into_iter().enumerate() {
-        assert_eq!(p1::add_binary(a.to_string(), b.to_string()), output, "case {} failed", i);
+        assert_eq!(
+            p1::add_binary(a.to_string(), b.to_string()),
+            output,
+            "case {} failed",
+            i
+        );
     }
 }
 
@@ -235,11 +262,7 @@ fn test_my_sqrt() {
 
 #[test]
 fn test_climb_stairs() {
-    let cases = [
-        (1, 1),
-        (2, 2),
-        (3, 3),
-    ];
+    let cases = [(1, 1), (2, 2), (3, 3)];
 
     for (i, (input, output)) in cases.into_iter().enumerate() {
         assert_eq!(p1::climb_stairs(input), output, "case {} failed", i);
@@ -249,15 +272,15 @@ fn test_climb_stairs() {
 #[test]
 fn test_delete_duplicates() {
     let cases = vec![
-        (vec![1,1,2], vec![1,2]),
-        (vec![1,1,2,3,3], vec![1,2,3]),
+        (vec![1, 1, 2], vec![1, 2]),
+        (vec![1, 1, 2, 3, 3], vec![1, 2, 3]),
         (vec![], vec![]),
     ];
 
     for (i, (input, output)) in cases.into_iter().enumerate() {
         let (input, output) = (
             ListNode::from_slice(input.as_slice()),
-            ListNode::from_slice(output.as_slice())
+            ListNode::from_slice(output.as_slice()),
         );
         assert_eq!(p1::delete_duplicates(input), output, "case {} failed", i);
     }
@@ -268,7 +291,7 @@ fn test_merge() {
     let cases = vec![
         (vec![], vec![], vec![]),
         (vec![], vec![2], vec![2]),
-        (vec![1,2,3], vec![2,5,6], vec![1,2,2,3,5,6]),
+        (vec![1, 2, 3], vec![2, 5, 6], vec![1, 2, 2, 3, 5, 6]),
         (vec![1], vec![], vec![1]),
     ];
 
@@ -282,27 +305,40 @@ fn test_merge() {
 #[test]
 fn test_inorder_traversal() {
     let cases = vec![
-        (vec![1, i32::MAX, 2, 3], vec![1,3,2]),
+        (vec![1, i32::MAX, 2, 3], vec![1, 3, 2]),
         (vec![], vec![]),
         (vec![1], vec![1]),
     ];
 
     for (i, (input, output)) in cases.into_iter().enumerate() {
-        assert_eq!(p1::inorder_traversal(TreeNode::from_slice(input.as_slice())), output, "case {} failed", i);
+        assert_eq!(
+            p1::inorder_traversal(TreeNode::from_slice(input.as_slice())),
+            output,
+            "case {} failed",
+            i
+        );
     }
 }
 
 #[test]
 fn test_is_same_tree() {
     let cases = vec![
-        (vec![1,2,3], vec![1,2,3], true),
-        (vec![1,2], vec![1,i32::MAX, 2], false),
+        (vec![1, 2, 3], vec![1, 2, 3], true),
+        (vec![1, 2], vec![1, i32::MAX, 2], false),
         (vec![], vec![], true),
         (vec![1], vec![], false),
-        (vec![1,2,1], vec![1,1,2], false),
+        (vec![1, 2, 1], vec![1, 1, 2], false),
     ];
 
     for (i, (in1, in2, output)) in cases.into_iter().enumerate() {
-        assert_eq!(p1::is_same_tree(TreeNode::from_slice(in1.as_slice()), TreeNode::from_slice(in2.as_slice())), output, "case {} failed", i);
+        assert_eq!(
+            p1::is_same_tree(
+                TreeNode::from_slice(in1.as_slice()),
+                TreeNode::from_slice(in2.as_slice())
+            ),
+            output,
+            "case {} failed",
+            i
+        );
     }
 }
