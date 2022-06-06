@@ -722,9 +722,15 @@ pub fn my_sqrt(x: i32) -> i32 {
         let m = (left + right) >> 1;
         let m2 = m * m;
         match m2.cmp(&x) {
-            Ordering::Less => {left = m;}
-            Ordering::Equal => {return m as i32;}
-            Ordering::Greater => {right = m;}
+            Ordering::Less => {
+                left = m;
+            }
+            Ordering::Equal => {
+                return m as i32;
+            }
+            Ordering::Greater => {
+                right = m;
+            }
         }
     }
 
@@ -874,7 +880,9 @@ impl TreeNode {
         while let Some(node) = stk.pop_front() {
             let (l, r) = (v.get(0), v.get(1));
             match l {
-                None => {break;}
+                None => {
+                    break;
+                }
                 Some(&val) => {
                     // `i32::MAX` represent `null` Node, just for test conveniently
                     if val != i32::MAX {
@@ -887,7 +895,9 @@ impl TreeNode {
             }
 
             match r {
-                None => {break;}
+                None => {
+                    break;
+                }
                 Some(&val) => {
                     if val != i32::MAX {
                         let right = Rc::new(RefCell::new(TreeNode::new(val)));

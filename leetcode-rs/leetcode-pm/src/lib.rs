@@ -1,34 +1,30 @@
-use std::collections::hash_map::DefaultHasher;
 use leetcode_meta::{Difficulty, Id, Problem, Tag, Tags, Topic};
 use proc_macro2::{Span, TokenStream, TokenTree};
 use quote::ToTokens;
+use std::collections::hash_map::DefaultHasher;
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
-use syn::{Type, Item, Result};
+use syn::{Item, Result, Type};
 
 #[derive(Hash)]
 struct ParseItemType(Item);
 
 impl ParseItemType {
     fn new(tokens: proc_macro::TokenStream) -> Result<Self> {
-        syn::parse::<Item>(tokens).map(|x| Self(x))
+        syn::parse::<Item>(tokens).map(Self)
     }
 
     fn ident_name(&self) -> String {
         match &self.0 {
-            Item::Fn(x) => {x.sig.ident.to_string()}
-            Item::Struct(x) => {x.ident.to_string()}
-            Item::Impl(x) => {
-                match x.self_ty.as_ref() {
-                    Type::Path(y) => {
-                        y.path.segments.last().unwrap().ident.to_string()
-                    }
-                    y @ _ => {
-                        panic!("Current doesn't support the type for ItemImpl: {:?}", y)
-                    }
+            Item::Fn(x) => x.sig.ident.to_string(),
+            Item::Struct(x) => x.ident.to_string(),
+            Item::Impl(x) => match x.self_ty.as_ref() {
+                Type::Path(y) => y.path.segments.last().unwrap().ident.to_string(),
+                y => {
+                    panic!("Current doesn't support the type for ItemImpl: {:?}", y)
                 }
-            }
-            x @ _ => {
+            },
+            x => {
                 panic!("Current doesn't support the item: {:?}", x)
             }
         }
@@ -41,7 +37,6 @@ impl ParseItemType {
 
         format!("{}_{:0>16x}", self.ident_name(), hasher.finish())
     }
-
 }
 
 impl ToTokens for ParseItemType {
