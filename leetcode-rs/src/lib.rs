@@ -7,7 +7,8 @@ pub mod medium;
 
 lazy_static::lazy_static! {
     pub static ref PROBLEMS: Arc<RwLock<Problems<Problem>>> = {
-        let p = Problems::new() | easy::PROBLEMS.read().unwrap().deref();
+        let p = Problems::new() | easy::PROBLEMS.read().unwrap().deref()
+            | medium::PROBLEMS.read().unwrap().deref();
         Arc::new(RwLock::new(p))
     };
 }
