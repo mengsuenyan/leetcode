@@ -25,7 +25,8 @@ ctor = { version = "0.1.22" }
 regex = { version = "1.5.6" }
 
 [build-dependencies]
-leetcode-meta = { path = "./leetcode-meta" }
+#leetcode-meta = { path = "./leetcode-meta" }
+rustversion = { version = "1.0.6" }
 
 [features]
 default = ["inject"]
