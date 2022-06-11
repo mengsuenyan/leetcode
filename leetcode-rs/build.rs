@@ -5,5 +5,5 @@ use rustversion::since;
 pub struct NeedToInstallRustVerGreatThan1_61_0;
 
 fn main() {
-    println!("{:?}", NeedToInstallRustVerGreatThan1_61_0{});
+    println!("{:?}", NeedToInstallRustVerGreatThan1_61_0 {});
 }

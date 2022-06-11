@@ -165,7 +165,8 @@ impl_enum!(
     StronglyConnectedComponent,
     RadixSort,
     RejectionSampling,
-    BiconnectedComponent
+    BiconnectedComponent,
+    Backtracking
 );
 
 pub type Id = u32;
