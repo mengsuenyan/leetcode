@@ -148,12 +148,12 @@ fn main() {
                 (Default::default(), p)
             };
             let (solution_s, p) = if let Some(s) = solution {
-                (format!("Solution: {s}\n"), p.find_by_title(&s))
+                (format!("Solution: {s}\n"), p.find_by_solution(&s))
             } else {
                 (Default::default(), p)
             };
             let (note_s, p) = if let Some(n) = note {
-                (format!("Note: {n}\n"), p.find_by_title(&n))
+                (format!("Note: {n}\n"), p.find_by_note(&n))
             } else {
                 (Default::default(), p)
             };

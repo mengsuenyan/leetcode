@@ -151,7 +151,7 @@ impl<T: AsRef<Problem>> Problems<T> {
         )
     }
 
-    pub fn find_by_note(&self, re: Regex) -> Problems<&Problem> {
+    pub fn find_by_note(&self, re: &Regex) -> Problems<&Problem> {
         Problems::from_vec(
             self.iter()
                 .filter(|p| !p.note().is_empty() && re.is_match(p.note()))
